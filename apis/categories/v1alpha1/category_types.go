@@ -33,20 +33,19 @@ type CustomAttributes struct {
 
 // CategoryParameters are the configurable fields of a Category.
 type CategoryParameters struct {
-	Name                string             `json:"name,omitempty"`
-	ID                  int                `json:"id,omitempty"`
-	IsActive            bool               `json:"is_active,omitempty"`
-	Position            int                `json:"position,omitempty"`
-	Level               int                `json:"level,omitempty"`
-	Children            string             `json:"children,omitempty"`
-	CreatedAt           string             `json:"created_at,omitempty"`
-	UpdatedAt           string             `json:"updated_at,omitempty"`
-	Path                string             `json:"path,omitempty"`
-	AvailableSortBy     []string           `json:"available_sort_by,omitempty"`
-	IncludeInMenu       bool               `json:"include_in_menu,omitempty"`
-	ExtensionAttributes interface{}        `json:"extension_attributes,omitempty"`
-	CustomAttributes    []CustomAttributes `json:"custom_attributes,omitempty"`
-	ParentID            int                `json:"parent_id,omitempty"`
+	Name             string             `json:"name,omitempty"`
+	ID               int                `json:"id,omitempty"`
+	IsActive         bool               `json:"is_active,omitempty"`
+	Position         int                `json:"position,omitempty"`
+	Level            int                `json:"level,omitempty"`
+	Children         string             `json:"children,omitempty"`
+	CreatedAt        string             `json:"created_at,omitempty"`
+	UpdatedAt        string             `json:"updated_at,omitempty"`
+	Path             string             `json:"path,omitempty"`
+	AvailableSortBy  []string           `json:"available_sort_by,omitempty"`
+	IncludeInMenu    bool               `json:"include_in_menu,omitempty"`
+	CustomAttributes []CustomAttributes `json:"custom_attributes,omitempty"`
+	ParentID         int                `json:"parent_id,omitempty"`
 }
 
 // CategoryObservation are the observable fields of a Category.

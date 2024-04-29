@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	errNotCategory    = "managed resource is not a Category custom resource"
+	errNotCategory  = "managed resource is not a Category custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
 	errGetCreds     = "cannot get credentials"
