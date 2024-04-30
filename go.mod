@@ -1,4 +1,4 @@
-module github.com/crossplane/provider-magento
+module github.com/web-seven/provider-magento
 
 go 1.20
 

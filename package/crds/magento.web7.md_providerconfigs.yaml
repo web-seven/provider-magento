@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
-  name: providerconfigs.magento.crossplane.io
+  name: providerconfigs.magento.web7.md
 spec:
-  group: magento.crossplane.io
+  group: magento.web7.md
   names:
     kind: ProviderConfig
     listKind: ProviderConfigList

@@ -20,8 +20,8 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/crossplane/provider-magento/internal/controller/category"
-	"github.com/crossplane/provider-magento/internal/controller/config"
+	"github.com/web-seven/provider-magento/internal/controller/category"
+	"github.com/web-seven/provider-magento/internal/controller/config"
 )
 
 // Setup creates all Magento controllers with the supplied logger and adds them to

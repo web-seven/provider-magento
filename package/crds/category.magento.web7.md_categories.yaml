@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
-  name: categories.categories.magento.crossplane.io
+  name: categories.category.magento.web7.md
 spec:
-  group: categories.magento.crossplane.io
+  group: category.magento.web7.md
   names:
     categories:
     - crossplane
@@ -67,10 +67,45 @@ spec:
               forProvider:
                 description: CategoryParameters are the configurable fields of a Category.
                 properties:
-                  configurableField:
+                  available_sort_by:
+                    items:
+                      type: string
+                    type: array
+                  children:
                     type: string
-                required:
-                - configurableField
+                  created_at:
+                    type: string
+                  custom_attributes:
+                    items:
+                      description: CustomAttributes type
+                      properties:
+                        attribute_code:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - attribute_code
+                      - value
+                      type: object
+                    type: array
+                  id:
+                    type: integer
+                  include_in_menu:
+                    type: boolean
+                  is_active:
+                    type: boolean
+                  level:
+                    type: integer
+                  name:
+                    type: string
+                  parent_id:
+                    type: integer
+                  path:
+                    type: string
+                  position:
+                    type: integer
+                  updated_at:
+                    type: string
                 type: object
               managementPolicies:
                 default:
@@ -275,8 +310,20 @@ spec:
               atProvider:
                 description: CategoryObservation are the observable fields of a Category.
                 properties:
-                  observableField:
+                  id:
+                    type: integer
+                  is_active:
+                    type: boolean
+                  level:
+                    type: integer
+                  name:
                     type: string
+                  parent_id:
+                    type: integer
+                  position:
+                    type: integer
+                  product_count:
+                    type: integer
                 type: object
               conditions:
                 description: Conditions of the resource.

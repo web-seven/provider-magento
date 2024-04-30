@@ -36,10 +36,10 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"github.com/crossplane/provider-magento/apis"
-	"github.com/crossplane/provider-magento/apis/v1alpha1"
-	magento "github.com/crossplane/provider-magento/internal/controller"
-	"github.com/crossplane/provider-magento/internal/features"
+	"github.com/web-seven/provider-magento/apis"
+	"github.com/web-seven/provider-magento/apis/v1alpha1"
+	magento "github.com/web-seven/provider-magento/internal/controller"
+	"github.com/web-seven/provider-magento/internal/features"
 )
 
 func main() {

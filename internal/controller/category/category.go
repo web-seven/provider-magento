@@ -32,9 +32,9 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"github.com/crossplane/provider-magento/apis/categories/v1alpha1"
-	apisv1alpha1 "github.com/crossplane/provider-magento/apis/v1alpha1"
-	"github.com/crossplane/provider-magento/internal/features"
+	"github.com/web-seven/provider-magento/apis/category/v1alpha1"
+	apisv1alpha1 "github.com/web-seven/provider-magento/apis/v1alpha1"
+	"github.com/web-seven/provider-magento/internal/features"
 )
 
 const (

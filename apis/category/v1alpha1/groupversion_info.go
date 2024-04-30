@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Crossplane Authors.
+Copyright 2024 Web Seven license.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ limitations under the License.
 
 // Package v1alpha1 contains the v1alpha1 group Sample resources of the Magento provider.
 // +kubebuilder:object:generate=true
-// +groupName=categories.magento.crossplane.io
+// +groupName=category.magento.web7.md
 // +versionName=v1alpha1
 package v1alpha1
 
@@ -27,7 +27,7 @@ import (
 
 // Package type metadata.
 const (
-	Group   = "categories.magento.crossplane.io"
+	Group   = "category.magento.web7.md"
 	Version = "v1alpha1"
 )
 
