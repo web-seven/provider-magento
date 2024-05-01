@@ -4,18 +4,18 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
-  name: mytypes.sample.template.crossplane.io
+  name: categories.category.magento.web7.md
 spec:
-  group: sample.template.crossplane.io
+  group: category.magento.web7.md
   names:
     categories:
     - crossplane
     - managed
-    - template
-    kind: MyType
-    listKind: MyTypeList
-    plural: mytypes
-    singular: mytype
+    - magento
+    kind: Category
+    listKind: CategoryList
+    plural: categories
+    singular: category
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -34,7 +34,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A MyType is an example API type.
+        description: A Category is an example API type.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -49,7 +49,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: A MyTypeSpec defines the desired state of a MyType.
+            description: A CategorySpec defines the desired state of a Category.
             properties:
               deletionPolicy:
                 default: Delete
@@ -65,12 +65,47 @@ spec:
                 - Delete
                 type: string
               forProvider:
-                description: MyTypeParameters are the configurable fields of a MyType.
+                description: CategoryParameters are the configurable fields of a Category.
                 properties:
-                  configurableField:
+                  available_sort_by:
+                    items:
+                      type: string
+                    type: array
+                  children:
                     type: string
-                required:
-                - configurableField
+                  created_at:
+                    type: string
+                  custom_attributes:
+                    items:
+                      description: CustomAttributes type
+                      properties:
+                        attribute_code:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - attribute_code
+                      - value
+                      type: object
+                    type: array
+                  id:
+                    type: integer
+                  include_in_menu:
+                    type: boolean
+                  is_active:
+                    type: boolean
+                  level:
+                    type: integer
+                  name:
+                    type: string
+                  parent_id:
+                    type: integer
+                  path:
+                    type: string
+                  position:
+                    type: integer
+                  updated_at:
+                    type: string
                 type: object
               managementPolicies:
                 default:
@@ -270,17 +305,25 @@ spec:
             - forProvider
             type: object
           status:
-            description: A MyTypeStatus represents the observed state of a MyType.
+            description: A CategoryStatus represents the observed state of a Category.
             properties:
               atProvider:
-                description: MyTypeObservation are the observable fields of a MyType.
+                description: CategoryObservation are the observable fields of a Category.
                 properties:
-                  configurableField:
+                  id:
+                    type: integer
+                  is_active:
+                    type: boolean
+                  level:
+                    type: integer
+                  name:
                     type: string
-                  observableField:
-                    type: string
-                required:
-                - configurableField
+                  parent_id:
+                    type: integer
+                  position:
+                    type: integer
+                  product_count:
+                    type: integer
                 type: object
               conditions:
                 description: Conditions of the resource.

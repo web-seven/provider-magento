@@ -116,9 +116,7 @@ jobs:
 
       - name: Check Diff
         id: check-diff
-        run: |
-          mkdir _output
-          make check-diff
+        run: make check-diff
 
       - name: Show diff
         if: failure() && steps.check-diff.outcome == 'failure'
