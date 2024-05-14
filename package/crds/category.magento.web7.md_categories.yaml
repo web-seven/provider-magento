@@ -67,15 +67,15 @@ spec:
               forProvider:
                 description: CategoryParameters are the configurable fields of a Category.
                 properties:
-                  available_sort_by:
+                  availableSortBy:
                     items:
                       type: string
                     type: array
                   children:
                     type: string
-                  created_at:
+                  createdAt:
                     type: string
-                  custom_attributes:
+                  customAttributes:
                     items:
                       description: CustomAttributes type
                       properties:
@@ -90,21 +90,21 @@ spec:
                     type: array
                   id:
                     type: integer
-                  include_in_menu:
+                  includeInMenu:
                     type: boolean
-                  is_active:
+                  isActive:
                     type: boolean
                   level:
                     type: integer
                   name:
                     type: string
-                  parent_id:
+                  parentId:
                     type: integer
                   path:
                     type: string
                   position:
                     type: integer
-                  updated_at:
+                  updatedAt:
                     type: string
                 type: object
               managementPolicies:
@@ -312,17 +312,17 @@ spec:
                 properties:
                   id:
                     type: integer
-                  is_active:
+                  isActive:
                     type: boolean
                   level:
                     type: integer
                   name:
                     type: string
-                  parent_id:
+                  parentId:
                     type: integer
                   position:
                     type: integer
-                  product_count:
+                  productCount:
                     type: integer
                 type: object
               conditions:

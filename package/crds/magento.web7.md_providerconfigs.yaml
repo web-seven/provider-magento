@@ -95,8 +95,11 @@ spec:
                 required:
                 - source
                 type: object
+              magentoUrl:
+                type: string
             required:
             - credentials
+            - magentoUrl
             type: object
           status:
             description: A ProviderConfigStatus reflects the observed state of a ProviderConfig.

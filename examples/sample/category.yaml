@@ -1,0 +1,11 @@
+apiVersion: category.magento.web7.md/v1alpha1
+kind: Category
+metadata:
+  name: test-category
+spec:
+  forProvider:
+    name: "Test Category"
+    is_active: true
+    include_in_menu: true
+  providerConfigRef:
+    name:  category-provider-config

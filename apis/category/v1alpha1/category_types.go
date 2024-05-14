@@ -35,28 +35,28 @@ type CustomAttributes struct {
 type CategoryParameters struct {
 	Name             string             `json:"name,omitempty"`
 	ID               int                `json:"id,omitempty"`
-	IsActive         bool               `json:"is_active,omitempty"`
+	IsActive         bool               `json:"isActive,omitempty"`
 	Position         int                `json:"position,omitempty"`
 	Level            int                `json:"level,omitempty"`
 	Children         string             `json:"children,omitempty"`
-	CreatedAt        string             `json:"created_at,omitempty"`
-	UpdatedAt        string             `json:"updated_at,omitempty"`
+	CreatedAt        string             `json:"createdAt,omitempty"`
+	UpdatedAt        string             `json:"updatedAt,omitempty"`
 	Path             string             `json:"path,omitempty"`
-	AvailableSortBy  []string           `json:"available_sort_by,omitempty"`
-	IncludeInMenu    bool               `json:"include_in_menu,omitempty"`
-	CustomAttributes []CustomAttributes `json:"custom_attributes,omitempty"`
-	ParentID         int                `json:"parent_id,omitempty"`
+	AvailableSortBy  []string           `json:"availableSortBy,omitempty"`
+	IncludeInMenu    bool               `json:"includeInMenu,omitempty"`
+	CustomAttributes []CustomAttributes `json:"customAttributes,omitempty"`
+	ParentID         int                `json:"parentId,omitempty"`
 }
 
 // CategoryObservation are the observable fields of a Category.
 type CategoryObservation struct {
 	ID           int    `json:"id,omitempty"`
-	ParentID     int    `json:"parent_id,omitempty"`
+	ParentID     int    `json:"parentId,omitempty"`
 	Name         string `json:"name,omitempty"`
-	IsActive     bool   `json:"is_active,omitempty"`
+	IsActive     bool   `json:"isActive,omitempty"`
 	Position     int    `json:"position,omitempty"`
 	Level        int    `json:"level,omitempty"`
-	ProductCount int    `json:"product_count,omitempty"`
+	ProductCount int    `json:"productCount,omitempty"`
 }
 
 // A CategorySpec defines the desired state of a Category.
