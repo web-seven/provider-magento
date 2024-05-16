@@ -16,7 +16,7 @@ limitations under the License.
 
 // Package v1alpha1 contains the v1alpha1 group Sample resources of the Magento provider.
 // +kubebuilder:object:generate=true
-// +groupName=category.magento.web7.md
+// +groupName=magento.web7.md
 // +versionName=v1alpha1
 package v1alpha1
 
@@ -27,7 +27,7 @@ import (
 
 // Package type metadata.
 const (
-	Group   = "category.magento.web7.md"
+	Group   = "magento.web7.md"
 	Version = "v1alpha1"
 )
 

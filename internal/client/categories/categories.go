@@ -1,46 +1,42 @@
+// Package categories provides functions for interacting with Magento categories.
 package categories
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"net/http"
 	"net/url"
+	"strconv"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/web-seven/provider-magento/apis/category/v1alpha1"
 
 	magento "github.com/web-seven/provider-magento/internal/client"
 )
 
+// Client is a struct that embeds the magento.Client struct.
 type Client struct {
 	magento.Client
 }
 
-func GetCategoryByName(c *magento.Client, categoryName string) (*v1alpha1.Category, error) {
-	path := fmt.Sprintf("%s/rest/all/V1/categories/list", c.BaseURL)
+// categoriesPath is the path for the Magento categories API.
+const categoriesPath = "/rest/default/V1/categories/"
 
+// GetCategoryByID retrieves a category by its ID.
+func GetCategoryByID(c *magento.Client, id string) (*v1alpha1.Category, error) {
 	queryParams := map[string]string{
-		"searchCriteria[filterGroups][0][filters][0][field]": "name",
-		"searchCriteria[filterGroups][0][filters][0][value]": categoryName,
+		"searchCriteria[filterGroups][0][filters][0][field]": "entity_id",
+		"searchCriteria[filterGroups][0][filters][0][value]": id,
 	}
-
 	query := url.Values{}
 	for key, value := range queryParams {
 		query.Add(key, value)
 	}
+	resp, err := c.Create().R().SetQueryParams(queryParams).Get(categoriesPath + "list")
 
-	restyClient, err := c.CreateRestyClient()
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := restyClient.R().
-		SetHeader("Authorization", "Bearer "+c.AccessToken).
-		SetQueryParams(queryParams).
-		Get(path)
-	if err != nil {
-		return nil, err
-	}
 	var searchResults struct {
 		Items []v1alpha1.CategoryParameters `json:"items"`
 	}
@@ -61,106 +57,57 @@ func GetCategoryByName(c *magento.Client, categoryName string) (*v1alpha1.Catego
 	}
 }
 
-func CreateCategory(c *magento.Client, category *v1alpha1.Category) (*v1alpha1.Category, error) {
-	path := c.BaseURL + "/rest/default/V1/categories"
+// CreateCategory creates a new category.
+func CreateCategory(c *magento.Client, category *v1alpha1.Category) (*v1alpha1.CategoryObservation, *resty.Response, error) {
 	requestBody := map[string]interface{}{
 		"category": category.Spec.ForProvider,
 	}
-	restyClient, err := c.CreateRestyClient()
+
+	resp, err := c.Create().R().SetHeader("Content-Type", "application/json").SetBody(requestBody).Post(categoriesPath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	resp, err := restyClient.R().
-		SetHeader("Authorization", "Bearer "+c.AccessToken).
-		SetHeader("Content-Type", "application/json").
-		SetBody(requestBody).
-		Post(path)
-
+	var categoryObservation *v1alpha1.CategoryObservation
+	err = json.Unmarshal(resp.Body(), &categoryObservation)
 	if err != nil {
-		return nil, errors.New("failed to create category: " + err.Error())
+		return nil, nil, err
 	}
 
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("unexpected status code: " + resp.Status() + ": " + string(resp.Body()))
-	}
-
-	var newCategory *v1alpha1.Category
-	err = json.Unmarshal(resp.Body(), &newCategory)
-	if err != nil {
-		return nil, errors.New("failed to parse response: " + err.Error())
-	}
-
-	return newCategory, nil
+	return categoryObservation, resp, nil
 }
 
-func UpdateCategoryByName(c *magento.Client, categoryName string, observed *v1alpha1.Category) error {
-	category, err := GetCategoryByName(c, categoryName)
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("%s/rest/all/V1/categories/%d", c.BaseURL, category.Spec.ForProvider.ID)
-
-	restyClient, err := c.CreateRestyClient()
-	if err != nil {
-		return err
-	}
-
+// UpdateCategoryByID updates a category by its ID.
+func UpdateCategoryByID(c *magento.Client, id int, observed *v1alpha1.Category) error {
 	requestBody := map[string]interface{}{
 		"category": observed.Spec.ForProvider,
 	}
 
-	resp, err := restyClient.R().
-		SetHeader("Authorization", "Bearer "+c.AccessToken).
-		SetHeader("Content-Type", "application/json").
-		SetBody(requestBody).
-		Put(path)
+	_, err := c.Create().R().SetBody(requestBody).Put(categoriesPath + strconv.Itoa(id))
 	if err != nil {
 		return err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return errors.New("failed to update category")
 	}
 
 	return nil
 }
 
-func DeleteCategoryByName(c *magento.Client, categoryName string) error {
-	category, err := GetCategoryByName(c, categoryName)
-	if err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("%s/rest/all/V1/categories/%d", c.BaseURL, category.Spec.ForProvider.ID)
-
-	restyClient, err := c.CreateRestyClient()
-	if err != nil {
-		return err
-	}
-
-	resp, err := restyClient.R().
-		SetHeader("Authorization", "Bearer "+c.AccessToken).
-		Delete(path)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return errors.New("failed to delete category")
-	}
-
-	return nil
+// DeleteCategoryByID deletes a category by its ID.
+func DeleteCategoryByID(c *magento.Client, id int) error {
+	_, err := c.Create().R().Delete(categoriesPath + strconv.Itoa(id))
+	return err
 }
 
-func IsCategoryUpToDate(name string, observed *v1alpha1.Category, desired *v1alpha1.Category) (bool, error) {
+// IsUpToDate checks if the observed category is up to date with the desired category.
+func IsUpToDate(observed *v1alpha1.Category, desired *v1alpha1.Category) (bool, error) {
 	if observed == nil || desired == nil {
 		return false, errors.New("observed or desired category is nil")
 	}
 
 	if observed.Spec.ForProvider.Name != desired.Spec.ForProvider.Name ||
-		observed.Spec.ForProvider.IsActive != desired.Spec.ForProvider.IsActive ||
-		observed.Spec.ForProvider.IncludeInMenu != desired.Spec.ForProvider.IncludeInMenu {
+		observed.Spec.ForProvider.IncludeInMenu != desired.Spec.ForProvider.IncludeInMenu ||
+		observed.Spec.ForProvider.ParentID != desired.Spec.ForProvider.ParentID ||
+		observed.Spec.ForProvider.Position != desired.Spec.ForProvider.Position ||
+		observed.Spec.ForProvider.Level != desired.Spec.ForProvider.Level {
 		return false, nil
 	}
 

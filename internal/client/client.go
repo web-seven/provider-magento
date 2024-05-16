@@ -19,10 +19,10 @@ func NewClient(baseURL, accessToken string) *Client {
 }
 
 // CreateRestyClient creates a new resty client with configuration from Client
-func (c *Client) CreateRestyClient() (*resty.Client, error) {
+func (c *Client) Create() *resty.Client {
 	restyClient := resty.New()
 	restyClient.SetBaseURL(c.BaseURL)
 	restyClient.SetAuthToken(c.AccessToken)
 
-	return restyClient, nil
+	return restyClient
 }

@@ -18,7 +18,8 @@ package category
 
 import (
 	"context"
-	"fmt"
+	"net/http"
+	"strconv"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/pkg/errors"
@@ -149,19 +150,26 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotCategory)
 	}
 
-	fmt.Printf("Observing: %+v", cr)
-	desired, err := categories.GetCategoryByName(c.service.client, cr.Spec.ForProvider.Name)
+	externalID := cr.GetAnnotations()["external-id"]
+	desired, err := categories.GetCategoryByID(c.service.client, externalID)
 	if err != nil {
 		return managed.ExternalObservation{
 			ResourceExists: false,
 		}, err
 	}
 
+	id, _ := strconv.Atoi(externalID)
 	if desired != nil {
 		cr.Status.SetConditions(xpv1.Available())
+		cr.Status.AtProvider.Name = desired.Spec.ForProvider.Name
+		cr.Status.AtProvider.ParentID = desired.Spec.ForProvider.ParentID
+		cr.Status.AtProvider.IsActive = desired.Spec.ForProvider.IsActive
+		cr.Status.AtProvider.Position = desired.Spec.ForProvider.Position
+		cr.Status.AtProvider.Level = desired.Spec.ForProvider.Level
+		cr.Status.AtProvider.ID = id
 	}
 
-	isUpToDate, _ := categories.IsCategoryUpToDate(cr.Spec.ForProvider.Name, cr, desired)
+	isUpToDate, _ := categories.IsUpToDate(cr, desired)
 	return managed.ExternalObservation{
 		ResourceExists:    true,
 		ResourceUpToDate:  isUpToDate,
@@ -174,16 +182,16 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	if !ok {
 		return managed.ExternalCreation{}, errors.New(errNotCategory)
 	}
-
-	fmt.Printf("Creating: %+v", cr)
-
-	_, err := categories.CreateCategory(c.service.client, cr)
+	cr.SetConditions(xpv1.Creating())
+	category, resp, err := categories.CreateCategory(c.service.client, cr)
+	cr.SetAnnotations(map[string]string{"external-id": strconv.Itoa(category.ID)})
+	if resp.StatusCode() != http.StatusOK {
+		return managed.ExternalCreation{}, errors.New(resp.String())
+	}
 	if err != nil {
 		return managed.ExternalCreation{}, err
 	}
 	return managed.ExternalCreation{
-		// Optionally return any details that may be required to connect to the
-		// external resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
 }
@@ -193,17 +201,13 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 	if !ok {
 		return managed.ExternalUpdate{}, errors.New(errNotCategory)
 	}
-	fmt.Printf("Updating: %+v", cr)
-
-	err := categories.UpdateCategoryByName(c.service.client, cr.Spec.ForProvider.Name, cr)
+	err := categories.UpdateCategoryByID(c.service.client, cr.Status.AtProvider.ID, cr)
 
 	if err != nil {
 		return managed.ExternalUpdate{}, err
 	}
 
 	return managed.ExternalUpdate{
-		// Optionally return any details that may be required to connect to the
-		// external resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
 }
@@ -213,9 +217,8 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) error {
 	if !ok {
 		return errors.New(errNotCategory)
 	}
-	fmt.Printf("Deleting: %+v", cr)
-
-	err := categories.DeleteCategoryByName(c.service.client, cr.Spec.ForProvider.Name)
+	cr.SetConditions(xpv1.Deleting())
+	err := categories.DeleteCategoryByID(c.service.client, cr.Status.AtProvider.ID)
 	if err != nil {
 		return err
 	}

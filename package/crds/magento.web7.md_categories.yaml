@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
-  name: categories.category.magento.web7.md
+  name: categories.magento.web7.md
 spec:
-  group: category.magento.web7.md
+  group: magento.web7.md
   names:
     categories:
     - crossplane
@@ -88,8 +88,6 @@ spec:
                       - value
                       type: object
                     type: array
-                  id:
-                    type: integer
                   includeInMenu:
                     type: boolean
                   isActive:

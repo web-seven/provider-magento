@@ -13,7 +13,6 @@ metadata:
   name: category-provider-config
 spec:
   hostName: ""
-  scheme: ""
   credentials:
     source: Secret
     secretRef:

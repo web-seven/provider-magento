@@ -34,7 +34,6 @@ type CustomAttributes struct {
 // CategoryParameters are the configurable fields of a Category.
 type CategoryParameters struct {
 	Name             string             `json:"name,omitempty"`
-	ID               int                `json:"id,omitempty"`
 	IsActive         bool               `json:"isActive,omitempty"`
 	Position         int                `json:"position,omitempty"`
 	Level            int                `json:"level,omitempty"`
