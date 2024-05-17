@@ -1,0 +1,13 @@
+apiVersion: magento.web7.md/v1alpha1
+kind: Category
+metadata:
+  name: example-category
+spec:
+  forProvider:
+    name: "Example Category"
+    level: 2
+    position: 1
+    isActive: true
+    includeInMenu: false
+  providerConfigRef:
+    name:  category-provider-config

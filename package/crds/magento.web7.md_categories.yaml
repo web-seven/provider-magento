@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
-  name: categories.category.magento.web7.md
+  name: categories.magento.web7.md
 spec:
-  group: category.magento.web7.md
+  group: magento.web7.md
   names:
     categories:
     - crossplane
@@ -67,15 +67,15 @@ spec:
               forProvider:
                 description: CategoryParameters are the configurable fields of a Category.
                 properties:
-                  available_sort_by:
+                  availableSortBy:
                     items:
                       type: string
                     type: array
                   children:
                     type: string
-                  created_at:
+                  createdAt:
                     type: string
-                  custom_attributes:
+                  customAttributes:
                     items:
                       description: CustomAttributes type
                       properties:
@@ -88,23 +88,21 @@ spec:
                       - value
                       type: object
                     type: array
-                  id:
-                    type: integer
-                  include_in_menu:
+                  includeInMenu:
                     type: boolean
-                  is_active:
+                  isActive:
                     type: boolean
                   level:
                     type: integer
                   name:
                     type: string
-                  parent_id:
+                  parentId:
                     type: integer
                   path:
                     type: string
                   position:
                     type: integer
-                  updated_at:
+                  updatedAt:
                     type: string
                 type: object
               managementPolicies:
@@ -312,17 +310,17 @@ spec:
                 properties:
                   id:
                     type: integer
-                  is_active:
+                  isActive:
                     type: boolean
                   level:
                     type: integer
                   name:
                     type: string
-                  parent_id:
+                  parentId:
                     type: integer
                   position:
                     type: integer
-                  product_count:
+                  productCount:
                     type: integer
                 type: object
               conditions:
