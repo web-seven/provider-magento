@@ -49,13 +49,32 @@ const (
 	errGetCreds     = "cannot get credentials"
 
 	errNewClient = "cannot create new Service"
+	api          = "/rest/"
+	id           = "external-id"
 )
 
-// A NoOpService does nothing.
+// MagentoService is a service that can connect to Magento API.
 type MagentoService struct {
 	client *magento.Client
 }
 
+// A connector is expected to produce an ExternalClient when its Connect method
+// is called.
+type connector struct {
+	kube                   client.Client
+	usage                  resource.Tracker
+	createMagentoServiceFn func(creds []byte, baseURL string) (*MagentoService, error)
+}
+
+// An ExternalClient observes, then either creates, updates, or deletes an
+// external resource to ensure it reflects the managed resource's desired state.
+type external struct {
+	kube client.Client
+	// A 'client' used to connect to the external resource API. In practice this
+	service *MagentoService
+}
+
+// newMagentoService creates a new MagentoService.
 var (
 	newMagentoService = func(creds []byte, baseURL string) (*MagentoService, error) {
 
@@ -101,9 +120,9 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		r := managed.NewReconciler(mgr,
 			resource.ManagedKind(gvk),
 			managed.WithExternalConnecter(&connector{
-				kube:         mgr.GetClient(),
-				usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
-				newServiceFn: newMagentoService}),
+				kube:                   mgr.GetClient(),
+				usage:                  resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
+				createMagentoServiceFn: newMagentoService}),
 			managed.WithLogger(o.Logger.WithValues("controller", name)),
 			managed.WithPollInterval(o.PollInterval),
 			managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))),
@@ -122,14 +141,6 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	}
 
 	return nil
-}
-
-// A connector is expected to produce an ExternalClient when its Connect method
-// is called.
-type connector struct {
-	kube         client.Client
-	usage        resource.Tracker
-	newServiceFn func(creds []byte, baseURL string) (*MagentoService, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -154,20 +165,12 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(data, pc.Spec.MagentoURL)
+	svc, err := c.createMagentoServiceFn(data, pc.Spec.MagentoURL)
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
 	client := c.kube
 	return &external{service: svc, kube: client}, nil
-}
-
-// An ExternalClient observes, then either creates, updates, or deletes an
-// external resource to ensure it reflects the managed resource's desired state.
-type external struct {
-	kube client.Client
-	// A 'client' used to connect to the external resource API. In practice this
-	service *MagentoService
 }
 
 // getDesiredCRD returns the CustomResourceDefinition that matches the group and kind.
@@ -189,9 +192,9 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	crds := &v1.CustomResourceDefinitionList{}
 	_ = c.kube.List(ctx, crds)
 	crd := getDesiredCRD(crds, mg.GetObjectKind().GroupVersionKind().Group, mg.GetObjectKind().GroupVersionKind().Kind)
-	c.service.client.Path = "/rest/" + strings.ToUpper(mg.GetObjectKind().GroupVersionKind().Version) + "/" + crd.Spec.Names.Plural
+	c.service.client.Path = api + strings.ToUpper(mg.GetObjectKind().GroupVersionKind().Version) + "/" + crd.Spec.Names.Plural
 
-	externalID := mg.GetAnnotations()["external-id"]
+	externalID := mg.GetAnnotations()[id]
 	desired, err := magento.GetResourceByID(c.service.client, externalID)
 	if err != nil {
 		return managed.ExternalObservation{
@@ -234,7 +237,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, err
 	}
 	resource, resp, err := magento.CreateResource(c.service.client, observed)
-	mg.SetAnnotations(map[string]string{"external-id": fmt.Sprintf("%v", resource["id"])})
+	mg.SetAnnotations(map[string]string{id: fmt.Sprintf("%v", resource["id"])})
 
 	if resp.StatusCode() != http.StatusOK {
 		return managed.ExternalCreation{}, errors.New(resp.String())
@@ -250,7 +253,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 // Update the external resource to reflect the managed resource's desired state.
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
 	observed, _ := runtime.DefaultUnstructuredConverter.ToUnstructured(mg)
-	externalID := mg.GetAnnotations()["external-id"]
+	externalID := mg.GetAnnotations()[id]
 
 	err := magento.UpdateResourceByID(c.service.client, externalID, observed)
 
@@ -265,7 +268,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 
 // Delete the external resource.
 func (c *external) Delete(ctx context.Context, mg resource.Managed) error {
-	externalID := mg.GetAnnotations()["external-id"]
+	externalID := mg.GetAnnotations()[id]
 	mg.SetConditions(xpv1.Deleting())
 	err := magento.DeleteResourceByID(c.service.client, externalID)
 	if err != nil {
