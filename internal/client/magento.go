@@ -9,8 +9,14 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+// Desired represents the desired state of a resource.
+type Desired struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // GetResourceByID retrieves a resource by its ID at specified api endpoint.
-func GetResourceByID(c *Client, id string) (map[string]interface{}, error) {
+func GetResourceByID(c *Client, id string) (*Desired, error) {
 	if id == "" {
 		return nil, errors.New("resource with ID" + id + " in " + c.Path + " not found")
 	}
@@ -19,7 +25,7 @@ func GetResourceByID(c *Client, id string) (map[string]interface{}, error) {
 		return nil, errors.New("resource in " + c.Path + " not found")
 	}
 
-	var resource map[string]interface{}
+	var resource *Desired
 	err := json.Unmarshal(resp.Body(), &resource)
 	if err != nil {
 		return nil, errors.New("failed to unmarshal response body")
@@ -68,12 +74,12 @@ func DeleteResourceByID(c *Client, id string) error {
 }
 
 // IsUpToDate checks if the observed resource is up to date with the desired resource.
-func IsUpToDate(observed map[string]interface{}, desired map[string]interface{}) (bool, error) {
+func IsUpToDate(observed map[string]interface{}, desired *Desired) (bool, error) {
 
 	if observed == nil || desired == nil {
 		return false, errors.New("observed or desired resource is nil")
 	}
-	if observed["spec"].(map[string]interface{})["forProvider"].(map[string]interface{})["name"] != desired["name"] {
+	if observed["spec"].(map[string]interface{})["forProvider"].(map[string]interface{})["name"] != desired.Name {
 		return false, nil
 	}
 

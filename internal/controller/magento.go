@@ -49,8 +49,9 @@ const (
 	errGetCreds     = "cannot get credentials"
 
 	errNewClient = "cannot create new Service"
-	api          = "/rest/"
+	api          = "/rest"
 	id           = "external-id"
+	separator    = "/"
 )
 
 // MagentoService is a service that can connect to Magento API.
@@ -192,8 +193,8 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	crds := &v1.CustomResourceDefinitionList{}
 	_ = c.kube.List(ctx, crds)
 	crd := getDesiredCRD(crds, mg.GetObjectKind().GroupVersionKind().Group, mg.GetObjectKind().GroupVersionKind().Kind)
-	c.service.client.Path = api + strings.ToUpper(mg.GetObjectKind().GroupVersionKind().Version) + "/" + crd.Spec.Names.Plural
 
+	c.service.client.Path = strings.Join([]string{api, strings.ToUpper(mg.GetObjectKind().GroupVersionKind().Version), crd.Spec.Names.Plural}, separator)
 	externalID := mg.GetAnnotations()[id]
 	desired, err := magento.GetResourceByID(c.service.client, externalID)
 	if err != nil {
@@ -208,8 +209,8 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}
 
 	if desired != nil {
-		observed["status"].(map[string]interface{})["atProvider"].(map[string]interface{})["id"] = desired["id"]
-		observed["status"].(map[string]interface{})["atProvider"].(map[string]interface{})["name"] = desired["name"]
+		observed["status"].(map[string]interface{})["atProvider"].(map[string]interface{})["id"] = desired.ID
+		observed["status"].(map[string]interface{})["atProvider"].(map[string]interface{})["name"] = desired.Name
 	}
 
 	err = runtime.DefaultUnstructuredConverter.FromUnstructured(observed, mg)
@@ -219,9 +220,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	mg.SetConditions(xpv1.Available())
 
 	isUpToDate, _ := magento.IsUpToDate(observed, desired)
-
 	return managed.ExternalObservation{
-
 		ResourceExists:    true,
 		ResourceUpToDate:  isUpToDate,
 		ConnectionDetails: managed.ConnectionDetails{},
