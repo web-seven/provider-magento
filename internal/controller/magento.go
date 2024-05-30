@@ -51,6 +51,8 @@ const (
 	api          = "/rest"
 	id           = "external-id"
 	separator    = "/"
+	group        = "magento.web7.md"
+	version      = "v1alpha1"
 )
 
 // MagentoService is a service that can connect to Magento API.
@@ -93,7 +95,7 @@ var (
 
 // isValidGVK returns true if the GroupVersionKind is a valid Magento API resource.
 func isValidGVK(gvk schema.GroupVersionKind) bool {
-	return gvk.Group == "magento.web7.md" && gvk.Version == "v1alpha1" &&
+	return gvk.Group == group && gvk.Version == version &&
 		!strings.Contains(gvk.Kind, "Options") && !strings.Contains(gvk.Kind, "List") &&
 		!strings.Contains(gvk.Kind, "Event") && !strings.Contains(gvk.Kind, "Config")
 }

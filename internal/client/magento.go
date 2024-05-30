@@ -9,6 +9,10 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+const (
+	separator = "/"
+)
+
 // Desired represents the desired state of a resource.
 type Desired struct {
 	ID   string `json:"id"`
@@ -20,7 +24,7 @@ func GetResourceByID(c *Client, id string) (*Desired, error) {
 	if id == "" {
 		return nil, errors.New("resource with ID" + id + " in " + c.Path + " not found")
 	}
-	resp, _ := c.Create().R().Get(c.Path + "/" + id)
+	resp, _ := c.Create().R().Get(c.Path + separator + id)
 	if resp.StatusCode() != http.StatusOK {
 		return nil, errors.New("resource in " + c.Path + " not found")
 	}
@@ -59,7 +63,7 @@ func UpdateResourceByID(c *Client, id string, observed map[string]interface{}) e
 	requestBody := map[string]interface{}{
 		strings.ToLower(observed["kind"].(string)): observed["spec"].(map[string]interface{})["forProvider"],
 	}
-	_, err := c.Create().R().SetBody(requestBody).Put(c.Path + "/" + id)
+	_, err := c.Create().R().SetBody(requestBody).Put(c.Path + separator + id)
 	if err != nil {
 		return err
 	}
@@ -69,7 +73,7 @@ func UpdateResourceByID(c *Client, id string, observed map[string]interface{}) e
 
 // DeleteResourceByID deletes a resource by its ID at specified api endpoint.
 func DeleteResourceByID(c *Client, id string) error {
-	_, err := c.Create().R().Delete(c.Path + "/" + id)
+	_, err := c.Create().R().Delete(c.Path + separator + id)
 	return err
 }
 
