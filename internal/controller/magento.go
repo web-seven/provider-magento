@@ -22,8 +22,6 @@ import (
 	"net/http"
 	"strings"
 
-	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
@@ -33,6 +31,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/pkg/errors"
 	magento "github.com/web-seven/provider-magento/internal/client"
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -75,15 +74,20 @@ type external struct {
 	service *MagentoService
 }
 
+var cachedMagento *MagentoService
+
 // newMagentoService creates a new MagentoService.
 var (
 	newMagentoService = func(creds []byte, baseURL string) (*MagentoService, error) {
-
+		if cachedMagento != nil {
+			return cachedMagento, nil
+		}
 		// Create a new Magento API client
 		c := magento.NewClient(baseURL, string(creds))
-		return &MagentoService{
+		cachedMagento = &MagentoService{
 			client: c,
-		}, nil
+		}
+		return cachedMagento, nil
 	}
 )
 
