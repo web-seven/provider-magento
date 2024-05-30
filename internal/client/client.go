@@ -8,6 +8,7 @@ import (
 type Client struct {
 	BaseURL     string
 	AccessToken string
+	Path        string
 }
 
 // NewClient initializes a new Magento API client configuration
