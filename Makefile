@@ -160,3 +160,20 @@ crossplane.help:
 help-special: crossplane.help
 
 .PHONY: crossplane.help help-special
+
+JSON_FILE := scheme.json
+check_file:
+	@if [ ! -f $(JSON_FILE) ]; then \
+		echo "File $(JSON_FILE) does not exist."; \
+		exit 1; \
+	fi
+# Extract path keys and process them
+process.scheme: check_file
+	@path_keys=$$(jq -r '.paths | keys[]' $(JSON_FILE) | grep -v '{'); \
+	for path in $$path_keys; do \
+		provider_name="magento.web7.md"; \
+		version=$$(echo "$$path" | awk -F/ '{print tolower($$2)}'); \
+		type=$$(echo "$$path" | awk -F/ '{print $$NF}'); \
+		type=$$(echo "$$type" | awk '{print toupper(substr($$0,1,1))tolower(substr($$0,2))}'); \
+		$(MAKE) provider.addtype provider=$$provider_name group=$$type kind=$$type apiversion=$$version; \
+	done

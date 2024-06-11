@@ -73,21 +73,7 @@ jobs:
       run: make submodules
 
     - name: Process swagger.json
-      run: |
-            #!/bin/bash
-            JSON_FILE="scheme.json"
-            if [ ! -f "$JSON_FILE" ]; then
-              echo "File $JSON_FILE does not exist."
-              exit 1
-            fi
-            path_keys=$(jq -r '.paths | keys[]' "$JSON_FILE" | grep -v '{')
-            for path in $path_keys; do
-              provider_name="magento.web7.md"
-              version=$(echo "$path" | awk -F/ '{print $2}')
-              type=$(echo "$path" | awk -F/ '{print $NF}')
-              type=$(echo "${type^}")
-              make provider.addtype provider=${provider_name} group=${version} kind=${type}
-            done
+      run: make process.scheme
 
     - name: Install crossplane CLI
       id: crossplane
