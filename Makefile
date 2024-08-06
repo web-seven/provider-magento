@@ -169,11 +169,13 @@ check_file:
 	fi
 # Extract path keys and process them
 process.scheme: check_file
-	@path_keys=$$(jq -r '.paths | keys[]' $(JSON_FILE) | grep -v '{'); \
+	@path_keys=$$(jq -r '.paths | keys[]' $(JSON_FILE) | grep -v '{' | grep -v '-'); \
 	for path in $$path_keys; do \
-		provider_name="magento.web7.md"; \
+		provider_name="Magento"; \
 		version=$$(echo "$$path" | awk -F/ '{print tolower($$2)}'); \
+		group=$$(echo "$$path" | awk -F/ '{print $$3}'); \
 		type=$$(echo "$$path" | awk -F/ '{print $$NF}'); \
 		type=$$(echo "$$type" | awk '{print toupper(substr($$0,1,1))tolower(substr($$0,2))}'); \
-		$(MAKE) provider.addtype provider=$$provider_name group=$$type kind=$$type apiversion=$$version; \
+		echo "Running make with provider_name=$$provider_name, group=$$group, kind=$$type, apiversion=$$version"; \
+		$(MAKE) provider.addtype provider=$$provider_name group=$$group kind=$$type apiversion=$$version; \
 	done
